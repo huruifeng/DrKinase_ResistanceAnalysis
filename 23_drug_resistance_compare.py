@@ -35,7 +35,7 @@ with open("results/GDSC_drug_resistance_candidates_dedup.txt","r") as f_x:
                 drug_resistance[id]["No"]["ic50"].append(ic50)
                 drug_resistance[id]["No"]["mut_pos"].append("-")
 
-                fp_db.write("\t".join([id, "No", cell_id_x, cell_name_x, str(ic50),hotspot_str])+"\n")
+                fp_db.write("\t".join([id, "No", cell_id_x, cell_name_x, str(ic50),"-"])+"\n")
         else:
             drug_resistance[id] = {}
             drug_resistance[id]["Yes"] = {}
@@ -56,7 +56,7 @@ with open("results/GDSC_drug_resistance_candidates_dedup.txt","r") as f_x:
                 drug_resistance[id]["No"]["cell"].append(cell_id_x + ":" + cell_name_x)
                 drug_resistance[id]["No"]["ic50"].append(ic50)
                 drug_resistance[id]["No"]["mut_pos"].append("-")
-                fp_db.write("\t".join([id, "No", cell_id_x, cell_name_x, str(ic50), hotspot_str])+"\n")
+                fp_db.write("\t".join([id, "No", cell_id_x, cell_name_x, str(ic50), "-"])+"\n")
 fp_db.close()
 
 # %% ===============================================================
