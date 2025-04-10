@@ -3,6 +3,7 @@ fp = open("results/GDSC_drug_resistance_candidates.txt","w")
 with open("results/GDSC_drug_has_mutated_hotspot.txt","r") as f:
     next(f)
     for line in f:
+        print(line)
         line_ls = line.strip().split("\t")
         kinase = line_ls[0]
         cell_id = line_ls[2]
