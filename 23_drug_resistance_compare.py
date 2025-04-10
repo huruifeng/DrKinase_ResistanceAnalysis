@@ -1,8 +1,9 @@
+# %% ================================================================
 drug_resistance = {}
-fp_db = open("GDSC_drug_resistance_compare_dbtable.txt","w")
-with open("GDSC_drug_resistance_ls.txt","r") as f_x:
+fp_db = open("results/GDSC_drug_resistance_compare_dbtable.txt","w")
+with open("results/GDSC_drug_resistance_candidates_dedup.txt","r") as f_x:
     for line_x in f_x:
-        line_ls_x = line_x.strip().split("\t")
+        line_ls_x = line_x[:-1].strip().split("\t")
         kinase_x = line_ls_x[0]
         cell_id_x = line_ls_x[2]
         cell_name_x = line_ls_x[3]
@@ -14,6 +15,10 @@ with open("GDSC_drug_resistance_ls.txt","r") as f_x:
 
         tissue_x = line_ls_x[9]
         subtissue_x = line_ls_x[10]
+        hotspot= line_ls_x[11]
+        hotspot_pos = line_ls_x[12]
+
+        hotspot_str = "@".join([hotspot, hotspot_pos])
 
         id = ":".join([kinase_x, drug_x, cancer_x, subtissue_x])
 
@@ -21,35 +26,42 @@ with open("GDSC_drug_resistance_ls.txt","r") as f_x:
             if Y_N_x == "Yes":
                 drug_resistance[id]["Yes"]["cell"].append(cell_id_x + ":" + cell_name_x)
                 drug_resistance[id]["Yes"]["ic50"].append(ic50)
+                drug_resistance[id]["Yes"]["mut_pos"].append(hotspot_str)
 
-                fp_db.write("\t".join([id, "Yes", cell_id_x, cell_name_x, str(ic50)])+"\n")
+                fp_db.write("\t".join([id, "Yes", cell_id_x, cell_name_x, str(ic50), hotspot_str])+"\n")
 
             if Y_N_x == "No":
                 drug_resistance[id]["No"]["cell"].append(cell_id_x + ":" + cell_name_x)
                 drug_resistance[id]["No"]["ic50"].append(ic50)
+                drug_resistance[id]["No"]["mut_pos"].append("-")
 
-                fp_db.write("\t".join([id, "No", cell_id_x, cell_name_x, str(ic50)])+"\n")
+                fp_db.write("\t".join([id, "No", cell_id_x, cell_name_x, str(ic50),hotspot_str])+"\n")
         else:
             drug_resistance[id] = {}
             drug_resistance[id]["Yes"] = {}
             drug_resistance[id]["No"] = {}
             drug_resistance[id]["Yes"]["cell"] = []
             drug_resistance[id]["Yes"]["ic50"] = []
+            drug_resistance[id]["Yes"]["mut_pos"] = []
             drug_resistance[id]["No"]["cell"] = []
             drug_resistance[id]["No"]["ic50"] = []
+            drug_resistance[id]["No"]["mut_pos"] = []
             if Y_N_x == "Yes":
                 drug_resistance[id]["Yes"]["cell"].append(cell_id_x + ":" + cell_name_x)
                 drug_resistance[id]["Yes"]["ic50"].append(ic50)
-                fp_db.write("\t".join([id, "Yes", cell_id_x, cell_name_x, str(ic50)])+"\n")
+                drug_resistance[id]["Yes"]["mut_pos"].append(hotspot_str)
+
+                fp_db.write("\t".join([id, "Yes", cell_id_x, cell_name_x, str(ic50), hotspot_str])+"\n")
             if Y_N_x == "No":
                 drug_resistance[id]["No"]["cell"].append(cell_id_x + ":" + cell_name_x)
                 drug_resistance[id]["No"]["ic50"].append(ic50)
-                fp_db.write("\t".join([id, "No", cell_id_x, cell_name_x, str(ic50)])+"\n")
+                drug_resistance[id]["No"]["mut_pos"].append("-")
+                fp_db.write("\t".join([id, "No", cell_id_x, cell_name_x, str(ic50), hotspot_str])+"\n")
 fp_db.close()
 
+# %% ===============================================================
 n = 0
-fp = open("GDSC_drug_resistance_compare.txt","w")
-fp_err = open("GDSC_drug_resistance_compare_only_hotspot.txt","w")
+fp = open("results/GDSC_drug_resistance_compare.txt","w")
 for id_i in drug_resistance:
     print(id_i)
     yes_cell = ",".join(drug_resistance[id_i]["Yes"]["cell"])
@@ -62,7 +74,6 @@ for id_i in drug_resistance:
         no_avg_ic50 = "NULL"
         no_ic50 = "NULL"
         n+=1
-        fp_err.write(id_i + "\n")
     else:
         no_cell = ",".join(drug_resistance[id_i]["No"]["cell"])
         no_avg_ic50 = sum(drug_resistance[id_i]["No"]["ic50"]) / len(drug_resistance[id_i]["No"]["ic50"])
